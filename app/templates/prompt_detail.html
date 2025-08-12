@@ -1,0 +1,594 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Loading State -->
+  <div id="loading" class="text-center py-12">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+    <p class="mt-4 text-gray-600">Loading prompt details...</p>
+  </div>
+
+  <!-- Main Content -->
+  <div id="prompt-detail" class="hidden">
+    <!-- Header Section -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+      <div class="flex items-start justify-between mb-4">
+        <div class="flex-1">
+          <h1 id="prompt-title" class="text-3xl font-bold text-gray-900 mb-2"></h1>
+          <p id="prompt-description" class="text-lg text-gray-600 mb-4"></p>
+          
+          <!-- Tags -->
+          <div id="prompt-tags" class="flex flex-wrap gap-2 mb-4"></div>
+          
+          <!-- Stats Row -->
+          <div class="flex items-center space-x-6 text-sm text-gray-500">
+            <div class="flex items-center">
+              <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
+                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"></path>
+              </svg>
+              <span id="prompt-views">0 views</span>
+            </div>
+            <div class="flex items-center">
+              <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+              </svg>
+              <span id="prompt-rating">No ratings yet</span>
+            </div>
+            <div class="flex items-center">
+              <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+              </svg>
+              <span id="prompt-outputs">0 outputs</span>
+            </div>
+            <span id="prompt-license" class="inline-flex items-center px-2 py-1 rounded text-xs bg-gray-100 text-gray-700"></span>
+          </div>
+</div>
+
+        <!-- Price and Actions -->
+        <div class="text-right ml-6">
+          <div class="text-3xl font-bold text-blue-600 mb-4" id="prompt-price"></div>
+          <div class="space-y-2">
+            <button id="buy-button" onclick="buyPrompt({{pid}})" class="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium">
+              Buy & Unlock
+            </button>
+            <button id="view-full-button" onclick="viewFull({{pid}})" class="w-full px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 font-medium">
+              I already own it
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Section -->
+    <div class="grid lg:grid-cols-3 gap-6">
+      <!-- Main Content -->
+      <div class="lg:col-span-2 space-y-6">
+        <!-- Preview/Full Content -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 class="text-xl font-semibold text-gray-900 mb-4">Content</h2>
+          <div id="content-preview" class="bg-gray-50 border rounded-lg p-4">
+            <pre id="preview-text" class="text-sm text-gray-700 whitespace-pre-wrap"></pre>
+          </div>
+          <div id="full-content" class="hidden mt-4">
+            <h3 class="font-semibold mb-2 text-gray-900">Full Content</h3>
+            <div class="bg-gray-50 border rounded-lg p-4">
+              <pre id="full-text" class="text-sm text-gray-700 whitespace-pre-wrap"></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Showcase Image Section -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 class="text-xl font-semibold text-gray-900 mb-4">Example Output</h2>
+          <div id="showcase-image-container" class="text-center">
+            <img id="showcase-image" src="/static/resources/main_image.png" alt="Example output" class="max-w-full h-auto rounded-lg border border-gray-200 mx-auto" style="max-height: 400px;">
+            <p id="showcase-caption" class="text-sm text-gray-600 mt-3 italic">"An entire world imagined in seconds."</p>
+          </div>
+        </div>
+
+        <!-- Outputs Section -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold text-gray-900">Community Outputs</h2>
+            <button id="add-output-button" onclick="showAddOutputForm()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 text-sm font-medium">
+              Add Output
+            </button>
+          </div>
+          
+          <!-- Add Output Form -->
+          <div id="add-output-form" class="hidden mb-6 p-4 bg-gray-50 rounded-lg">
+            <h3 class="font-semibold mb-3">Share Your Output</h3>
+            <form id="output-form" onsubmit="submitOutput(event)">
+              <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Your Output</label>
+                <textarea id="output-text" required rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Paste your AI output here..."></textarea>
+              </div>
+              
+              <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">AI Model Used (Optional)</label>
+                <select id="ai-model" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                  <option value="">Select AI Model</option>
+                  <option value="ChatGPT">ChatGPT</option>
+                  <option value="Gemini">Gemini</option>
+                  <option value="Claude">Claude</option>
+                  <option value="Bard">Bard</option>
+                  <option value="Perplexity">Perplexity</option>
+                  <option value="Copilot">Copilot</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              
+              <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Result Image (Optional)</label>
+                <div class="space-y-2">
+                  <input type="file" id="output-image" accept="image/*" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" onchange="previewImage(event)">
+                  <div id="image-preview" class="hidden">
+                    <img id="preview-img" class="max-w-xs rounded-lg border border-gray-200" alt="Preview">
+                    <button type="button" onclick="removeImage()" class="mt-2 px-3 py-1 text-sm text-red-600 hover:text-red-700">Remove Image</button>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Rating (Optional)</label>
+                <div class="flex items-center space-x-2">
+                  <span class="text-sm text-gray-500">1</span>
+                  <input type="range" id="output-rating" min="1" max="5" value="3" class="flex-1">
+                  <span class="text-sm text-gray-500">5</span>
+                  <span id="rating-display" class="text-sm font-medium text-blue-600">3</span>
+                </div>
+              </div>
+              
+              <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Feedback (Optional)</label>
+                <textarea id="output-feedback" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="How was this prompt? Any suggestions?"></textarea>
+              </div>
+              
+              <div class="flex space-x-3">
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                  Submit Output
+                </button>
+                <button type="button" onclick="hideAddOutputForm()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+          
+          <!-- Outputs List -->
+          <div id="outputs-list" class="space-y-4">
+            <!-- Outputs will be loaded here -->
+          </div>
+          
+          <!-- No Outputs Message -->
+          <div id="no-outputs" class="text-center py-8 text-gray-500">
+            <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <p>No outputs yet. Be the first to share your results!</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="space-y-6">
+        <!-- Rating Stats -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Rating Statistics</h3>
+          <div id="rating-stats" class="space-y-3">
+            <!-- Rating stats will be loaded here -->
+          </div>
+        </div>
+
+        <!-- Similar Prompts -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Similar Prompts</h3>
+          <div id="similar-prompts" class="space-y-3">
+            <!-- Similar prompts will be loaded here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let promptData = null;
+let userOwnsPrompt = false;
+
+// Load prompt details on page load
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadPromptDetails();
+  await loadPromptOutputs();
+  await loadPromptStats();
+});
+
+async function loadPromptDetails() {
+  try {
+    const response = await fetch(`/api/prompts/{{pid}}`);
+    if (!response.ok) throw new Error('Failed to load prompt');
+    
+    promptData = await response.json();
+    
+    // Update UI
+    document.getElementById('prompt-title').textContent = promptData.title;
+    document.getElementById('prompt-description').textContent = promptData.description;
+    document.getElementById('prompt-views').textContent = `${promptData.views} views`;
+    document.getElementById('prompt-price').textContent = promptData.price_formatted;
+    document.getElementById('prompt-license').textContent = promptData.license_type;
+    document.getElementById('preview-text').textContent = promptData.preview;
+    
+    // Show tags
+    const tagsContainer = document.getElementById('prompt-tags');
+    if (promptData.tags && promptData.tags.length > 0) {
+      promptData.tags.forEach(tag => {
+        const tagElement = document.createElement('span');
+        tagElement.className = 'inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800';
+        tagElement.textContent = tag;
+        tagsContainer.appendChild(tagElement);
+      });
+    }
+    
+    // Check if user owns the prompt
+    const token = localStorage.getItem("pm_token");
+    if (token) {
+      try {
+        const fullResponse = await fetch(`/api/prompts/{{pid}}/full`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (fullResponse.ok) {
+          userOwnsPrompt = true;
+          const fullData = await fullResponse.json();
+          document.getElementById('full-text').textContent = fullData.content;
+          document.getElementById('full-content').classList.remove('hidden');
+          document.getElementById('content-preview').classList.add('hidden');
+        }
+      } catch (error) {
+        console.log('User does not own this prompt');
+      }
+    }
+    
+    // Set showcase image and caption based on prompt ID
+    setShowcaseImage({{pid}});
+    
+    // Hide loading, show content
+    document.getElementById('loading').classList.add('hidden');
+    document.getElementById('prompt-detail').classList.remove('hidden');
+    
+  } catch (error) {
+    console.error('Error loading prompt:', error);
+    document.getElementById('loading').innerHTML = '<p class="text-red-600">Error loading prompt details</p>';
+  }
+}
+
+async function loadPromptOutputs() {
+  try {
+    const response = await fetch(`/api/outputs/prompt/{{pid}}`);
+    const outputs = await response.json();
+    
+    const outputsList = document.getElementById('outputs-list');
+    const noOutputs = document.getElementById('no-outputs');
+    
+    if (outputs.length === 0) {
+      outputsList.classList.add('hidden');
+      noOutputs.classList.remove('hidden');
+      return;
+    }
+    
+    noOutputs.classList.add('hidden');
+    outputsList.classList.remove('hidden');
+    outputsList.innerHTML = '';
+    
+    outputs.forEach(output => {
+      const outputElement = createOutputElement(output);
+      outputsList.appendChild(outputElement);
+    });
+    
+  } catch (error) {
+    console.error('Error loading outputs:', error);
+  }
+}
+
+async function loadPromptStats() {
+  try {
+    const response = await fetch(`/api/outputs/prompt/{{pid}}/stats`);
+    const stats = await response.json();
+    
+    // Update rating display
+    if (stats.average_rating) {
+      document.getElementById('prompt-rating').textContent = `${stats.average_rating} ★ (${stats.total_outputs} outputs)`;
+    }
+    
+    // Update outputs count
+    document.getElementById('prompt-outputs').textContent = `${stats.total_outputs} outputs`;
+    
+    // Show rating distribution
+    const ratingStats = document.getElementById('rating-stats');
+    if (stats.rating_distribution && Object.keys(stats.rating_distribution).length > 0) {
+      ratingStats.innerHTML = '';
+      for (let i = 5; i >= 1; i--) {
+        const count = stats.rating_distribution[i] || 0;
+        const percentage = stats.total_outputs > 0 ? Math.round((count / stats.total_outputs) * 100) : 0;
+        
+        const ratingRow = document.createElement('div');
+        ratingRow.className = 'flex items-center space-x-2';
+        ratingRow.innerHTML = `
+          <span class="text-sm text-gray-600 w-4">${i}★</span>
+          <div class="flex-1 bg-gray-200 rounded-full h-2">
+            <div class="bg-yellow-400 h-2 rounded-full" style="width: ${percentage}%"></div>
+          </div>
+          <span class="text-sm text-gray-600 w-8">${count}</span>
+        `;
+        ratingStats.appendChild(ratingRow);
+      }
+    } else {
+      ratingStats.innerHTML = '<p class="text-gray-500 text-sm">No ratings yet</p>';
+    }
+    
+  } catch (error) {
+    console.error('Error loading stats:', error);
+  }
+}
+
+function createOutputElement(output) {
+  const div = document.createElement('div');
+  div.className = 'border border-gray-200 rounded-lg p-4';
+  
+  let aiModelBadge = '';
+  if (output.ai_model) {
+    aiModelBadge = `<span class="inline-flex items-center px-2 py-1 rounded text-xs bg-blue-100 text-blue-700 mr-2">${output.ai_model}</span>`;
+  }
+  
+  let imageSection = '';
+  if (output.image_url) {
+    imageSection = `
+      <div class="mt-3">
+        <img src="${output.image_url}" alt="Output result" class="max-w-full h-auto rounded-lg border border-gray-200" style="max-height: 300px;">
+      </div>
+    `;
+  }
+  
+  div.innerHTML = `
+    <div class="flex items-start justify-between mb-3">
+      <div class="flex items-center space-x-2">
+        <span class="text-sm font-medium text-gray-900">${output.user_email}</span>
+        ${aiModelBadge}
+        <span class="text-xs text-gray-500">${new Date(output.created_at).toLocaleDateString()}</span>
+      </div>
+      ${output.rating ? `<div class="flex items-center text-yellow-400">${'★'.repeat(output.rating)}${'☆'.repeat(5-output.rating)}</div>` : ''}
+    </div>
+    <div class="bg-gray-50 rounded p-3 mb-3">
+      <pre class="text-sm text-gray-700 whitespace-pre-wrap">${output.output_text}</pre>
+    </div>
+    ${imageSection}
+    ${output.feedback ? `<div class="text-sm text-gray-600 italic mt-2">"${output.feedback}"</div>` : ''}
+  `;
+  return div;
+}
+
+function showAddOutputForm() {
+  const token = localStorage.getItem("pm_token");
+  if (!token) {
+    openAuth('login');
+    return;
+  }
+  
+  if (!userOwnsPrompt) {
+    alert('You need to purchase this prompt to add outputs');
+    return;
+  }
+  
+  document.getElementById('add-output-form').classList.remove('hidden');
+  document.getElementById('add-output-button').classList.add('hidden');
+}
+
+function hideAddOutputForm() {
+  document.getElementById('add-output-form').classList.add('hidden');
+  document.getElementById('add-output-button').classList.remove('hidden');
+  document.getElementById('output-form').reset();
+}
+
+async function submitOutput(event) {
+  event.preventDefault();
+  
+  const token = localStorage.getItem("pm_token");
+  if (!token) {
+    openAuth('login');
+    return;
+  }
+  
+  const outputText = document.getElementById('output-text').value;
+  const rating = parseInt(document.getElementById('output-rating').value);
+  const feedback = document.getElementById('output-feedback').value;
+  const aiModel = document.getElementById('ai-model').value;
+  const imageFile = document.getElementById('output-image').files[0];
+  
+  let imageUrl = null;
+  
+  // Upload image if selected
+  if (imageFile) {
+    try {
+      const formData = new FormData();
+      formData.append('file', imageFile);
+      
+      const uploadResponse = await fetch('/api/uploads/image', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+      
+      if (!uploadResponse.ok) {
+        const error = await uploadResponse.json();
+        alert('Error uploading image: ' + (error.detail || 'Unknown error'));
+        return;
+      }
+      
+      const uploadData = await uploadResponse.json();
+      imageUrl = uploadData.url;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert('Error uploading image. Please try again.');
+      return;
+    }
+  }
+  
+  try {
+    const response = await fetch('/api/outputs', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        prompt_id: {{pid}},
+        output_text: outputText,
+        rating: rating,
+        feedback: feedback,
+        ai_model: aiModel || null,
+        image_url: imageUrl
+      })
+    });
+    
+    if (response.ok) {
+      alert('Output submitted successfully!');
+      hideAddOutputForm();
+      await loadPromptOutputs();
+      await loadPromptStats();
+    } else {
+      const error = await response.json();
+      alert('Error submitting output: ' + (error.detail || 'Unknown error'));
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Error submitting output. Please try again.');
+  }
+}
+
+function previewImage(event) {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('preview-img').src = e.target.result;
+      document.getElementById('image-preview').classList.remove('hidden');
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+function removeImage() {
+  document.getElementById('output-image').value = '';
+  document.getElementById('image-preview').classList.add('hidden');
+}
+
+// Rating slider
+document.addEventListener('DOMContentLoaded', () => {
+  const ratingSlider = document.getElementById('output-rating');
+  const ratingDisplay = document.getElementById('rating-display');
+  
+  if (ratingSlider && ratingDisplay) {
+    ratingSlider.addEventListener('input', (e) => {
+      ratingDisplay.textContent = e.target.value;
+    });
+  }
+});
+
+async function buyPrompt(pid) {
+  const token = localStorage.getItem("pm_token");
+  if (!token) {
+    openAuth('login');
+    return;
+  }
+  
+  try {
+    const response = await fetch(`/api/purchase/${pid}/checkout`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    if (!response.ok) {
+      alert('Checkout failed');
+      return;
+    }
+    
+    const data = await response.json();
+    if (data.dev) {
+    window.location.href = "/success";
+  } else {
+    window.location.href = data.checkout_url;
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Error processing purchase. Please try again.');
+  }
+}
+
+async function viewFull(pid) {
+  const token = localStorage.getItem("pm_token");
+  if (!token) {
+    openAuth('login');
+    return;
+  }
+  
+  try {
+    const response = await fetch(`/api/prompts/${pid}/full`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    if (!response.ok) {
+      alert('Access denied (you must own this prompt)');
+      return;
+    }
+    
+    const data = await response.json();
+    document.getElementById('full-text').textContent = data.content;
+  document.getElementById('full-content').classList.remove('hidden');
+    document.getElementById('content-preview').classList.add('hidden');
+    userOwnsPrompt = true;
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Error loading full content. Please try again.');
+  }
+}
+
+function setShowcaseImage(promptId) {
+  // Mapping of prompt IDs to showcase images and captions
+  const showcaseData = {
+    1: {
+      image: '/static/resources/main_image.png',
+      caption: '"An entire world imagined in seconds."'
+    },
+    2: {
+      image: '/static/resources/main_image.png',
+      caption: '"From idea to brand in one click."'
+    },
+    3: {
+      image: '/static/resources/main_image.png',
+      caption: '"Every photo a movie scene."'
+    },
+    4: {
+      image: '/static/resources/main_image.png',
+      caption: '"Turn 1-hour videos into shareable threads."'
+    },
+    5: {
+      image: '/static/resources/main_image.png',
+      caption: '"History, reimagined through AI."'
+    },
+    6: {
+      image: '/static/resources/main_image.png',
+      caption: '"Land more interviews with AI-crafted resumes."'
+    }
+  };
+  
+  const data = showcaseData[promptId] || {
+    image: '/static/resources/main_image.png',
+    caption: '"Example output from this prompt."'
+  };
+  
+  document.getElementById('showcase-image').src = data.image;
+  document.getElementById('showcase-caption').textContent = data.caption;
+}
+</script>
+{% endblock %}

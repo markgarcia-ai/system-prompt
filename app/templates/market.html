@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+{% block content %}
+<!-- Market Header -->
+<div class="bg-gradient-to-r from-blue-600 to-indigo-700 py-16">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <h1 class="text-4xl font-bold text-white mb-4">
+      AI Prompt Marketplace
+    </h1>
+    <p class="text-xl text-blue-100 max-w-3xl mx-auto">
+      Discover high-quality prompts created by AI experts. Browse, learn, and find the perfect prompt for your next AI project.
+    </p>
+  </div>
+</div>
+
+<!-- Search and Filter Section -->
+<div class="bg-white border-b border-gray-200 py-6">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+      <!-- Search Bar -->
+      <div class="relative flex-1 max-w-md">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+        </div>
+        <input type="text" 
+               id="searchInput"
+               placeholder="Search prompts..." 
+               class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+      </div>
+      
+      <!-- Filter Options -->
+      <div class="flex gap-3">
+        <select id="tagFilter" class="px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+          <option value="">All Tags</option>
+        </select>
+        <select id="priceFilter" class="px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+          <option value="">All Prices</option>
+          <option value="free">Free</option>
+          <option value="low">Under $5</option>
+          <option value="medium">$5 - $10</option>
+          <option value="high">Over $10</option>
+        </select>
+        <select id="licenseFilter" class="px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+          <option value="">All Licenses</option>
+          <option value="personal">Personal</option>
+          <option value="commercial">Commercial</option>
+          <option value="commercial-derivative">Commercial + Derivatives</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Prompts Grid -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="promptsGrid">
+    {% for prompt in prompts %}
+    <div class="group bg-white rounded-2xl border border-gray-200 hover:border-blue-300 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+      <!-- Prompt Image/Icon -->
+      <div class="p-6 pb-4">
+        <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+          <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+          </svg>
+        </div>
+        
+        <!-- Prompt Title -->
+        <h3 class="text-xl font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-200">
+          {{ prompt.title }}
+        </h3>
+        
+        <!-- Prompt Description -->
+        <p class="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-3">
+          {{ prompt.description }}
+        </p>
+        
+        <!-- Tags -->
+        {% if prompt.tags %}
+        <div class="flex flex-wrap gap-1 mb-4">
+          {% for tag in prompt.tags %}
+          <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
+            {{ tag }}
+          </span>
+          {% endfor %}
+        </div>
+        {% endif %}
+        
+        <!-- Stats -->
+        <div class="flex items-center justify-between text-xs text-gray-500 mb-4">
+          <div class="flex items-center space-x-4">
+            <span class="flex items-center">
+              <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
+                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"></path>
+              </svg>
+              {{ prompt.views }} views
+            </span>
+            <span class="inline-flex items-center px-2 py-1 rounded text-xs bg-gray-100 text-gray-700">
+              {{ prompt.license_type }}
+            </span>
+          </div>
+          {% if prompt.is_featured %}
+          <span class="inline-flex items-center px-2 py-1 rounded text-xs bg-yellow-100 text-yellow-800">
+            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+            </svg>
+            Featured
+          </span>
+          {% endif %}
+        </div>
+        
+        <!-- Price and Actions -->
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            {% if prompt.price_cents > 0 %}
+            <span class="text-2xl font-bold text-blue-600">${{ "%.2f"|format(prompt.price_cents / 100) }}</span>
+            {% else %}
+            <span class="text-lg font-semibold text-green-600">Free</span>
+            {% endif %}
+          </div>
+          
+          <div class="flex space-x-2">
+            <a href="/prompts/{{ prompt.id }}" 
+               class="px-4 py-2 text-sm font-medium text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-colors duration-200">
+              View Details
+            </a>
+            {% if prompt.price_cents > 0 %}
+            <button onclick="purchasePrompt({{ prompt.id }})" 
+                    class="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+              Purchase
+            </button>
+            {% else %}
+            <button onclick="downloadPrompt({{ prompt.id }})" 
+                    class="px-4 py-2 text-sm font-medium bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200">
+              Download
+            </button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      
+      <!-- Prompt Footer -->
+      <div class="px-6 py-4 bg-gray-50 rounded-b-2xl">
+        <div class="flex items-center justify-between text-sm text-gray-500">
+          <div class="flex items-center space-x-4">
+            <span class="flex items-center">
+              <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+              </svg>
+              {{ prompt.owner.email if prompt.owner else "Unknown" }}
+            </span>
+          </div>
+          <div class="flex items-center">
+            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+            </svg>
+            <span>AI Prompt</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  
+  <!-- Empty State -->
+  {% if not prompts %}
+  <div class="text-center py-16">
+    <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+      <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+      </svg>
+    </div>
+    <h3 class="text-xl font-medium text-gray-900 mb-2">No prompts found</h3>
+    <p class="text-gray-500 mb-6">Try adjusting your search or filter criteria</p>
+    <button onclick="clearFilters()" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+      Clear Filters
+    </button>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Pagination -->
+{% if prompts and prompts|length > 0 %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+  <div class="flex items-center justify-between">
+    <div class="text-sm text-gray-700">
+      Showing <span class="font-medium">1</span> to <span class="font-medium">{{ prompts|length }}</span> of <span class="font-medium">{{ prompts|length }}</span> results
+    </div>
+    <div class="flex space-x-2">
+      <button class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+        Previous
+      </button>
+      <button class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+        Next
+      </button>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<script>
+// Load tags for filter
+async function loadTags() {
+  try {
+    const response = await fetch('/api/tags');
+    if (response.ok) {
+      const tags = await response.json();
+      const tagFilter = document.getElementById('tagFilter');
+      
+      tags.forEach(tag => {
+        const option = document.createElement('option');
+        option.value = tag.name;
+        option.textContent = tag.name;
+        tagFilter.appendChild(option);
+      });
+    }
+  } catch (error) {
+    console.error('Error loading tags:', error);
+  }
+}
+
+// Search and filter functionality
+document.getElementById('searchInput').addEventListener('input', filterPrompts);
+document.getElementById('tagFilter').addEventListener('change', filterPrompts);
+document.getElementById('priceFilter').addEventListener('change', filterPrompts);
+document.getElementById('licenseFilter').addEventListener('change', filterPrompts);
+
+function filterPrompts() {
+  const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+  const tag = document.getElementById('tagFilter').value;
+  const price = document.getElementById('priceFilter').value;
+  const license = document.getElementById('licenseFilter').value;
+  
+  const promptCards = document.querySelectorAll('#promptsGrid > div');
+  
+  promptCards.forEach(card => {
+    const title = card.querySelector('h3').textContent.toLowerCase();
+    const description = card.querySelector('p').textContent.toLowerCase();
+    const priceText = card.querySelector('.text-2xl, .text-lg').textContent;
+    const licenseText = card.querySelector('.bg-gray-100')?.textContent || '';
+    const tags = Array.from(card.querySelectorAll('.bg-blue-100')).map(tag => tag.textContent.trim());
+    
+    let show = true;
+    
+    // Search filter
+    if (searchTerm && !title.includes(searchTerm) && !description.includes(searchTerm)) {
+      show = false;
+    }
+    
+    // Tag filter
+    if (tag && !tags.includes(tag)) {
+      show = false;
+    }
+    
+    // License filter
+    if (license && licenseText !== license) {
+      show = false;
+    }
+    
+    // Price filter
+    if (price) {
+      if (price === 'free' && !priceText.includes('Free')) show = false;
+      if (price === 'low' && parseFloat(priceText.replace('$', '')) >= 5) show = false;
+      if (price === 'medium' && (parseFloat(priceText.replace('$', '')) < 5 || parseFloat(priceText.replace('$', '')) > 10)) show = false;
+      if (price === 'high' && parseFloat(priceText.replace('$', '')) <= 10) show = false;
+    }
+    
+    card.style.display = show ? 'block' : 'none';
+  });
+}
+
+function clearFilters() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('tagFilter').value = '';
+  document.getElementById('priceFilter').value = '';
+  document.getElementById('licenseFilter').value = '';
+  filterPrompts();
+}
+
+// Load tags when page loads
+document.addEventListener('DOMContentLoaded', loadTags);
+
+function purchasePrompt(promptId) {
+  // Redirect to login if not authenticated, otherwise to purchase flow
+  window.location.href = `/prompts/${promptId}`;
+}
+
+function downloadPrompt(promptId) {
+  // Handle free prompt download
+  window.location.href = `/prompts/${promptId}`;
+}
+</script>
+{% endblock %} 

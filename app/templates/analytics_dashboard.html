@@ -1,0 +1,433 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Analytics Dashboard</h1>
+    <p class="text-gray-600 mt-2">Track your prompt performance and marketplace insights</p>
+  </div>
+
+  <!-- Overview Stats -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+          </div>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-gray-500">Total Prompts</p>
+          <p id="total-prompts" class="text-2xl font-semibold text-gray-900">-</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+            </svg>
+          </div>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-gray-500">Total Views</p>
+          <p id="total-views" class="text-2xl font-semibold text-gray-900">-</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+            <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+            </svg>
+          </div>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-gray-500">Total Purchases</p>
+          <p id="total-purchases" class="text-2xl font-semibold text-gray-900">-</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <div class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
+            <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+            </svg>
+          </div>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-gray-500">Total Revenue</p>
+          <p id="total-revenue" class="text-2xl font-semibold text-gray-900">-</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+    <div class="border-b border-gray-200">
+      <nav class="-mb-px flex space-x-8 px-6">
+        <button id="tab-overview" class="tab-button border-b-2 border-blue-500 py-4 px-1 text-sm font-medium text-blue-600">
+          Overview
+        </button>
+        <button id="tab-prompts" class="tab-button border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700">
+          My Prompts
+        </button>
+        <button id="tab-marketplace" class="tab-button border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700">
+          Marketplace
+        </button>
+      </nav>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="p-6">
+      <!-- Overview Tab -->
+      <div id="tab-content-overview" class="tab-content">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <!-- Top Performing Prompts -->
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Top Performing Prompts</h3>
+            <div id="top-prompts" class="space-y-3">
+              <!-- Will be populated by JavaScript -->
+            </div>
+          </div>
+
+          <!-- Recent Activity -->
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+            <div id="recent-activity" class="space-y-3">
+              <!-- Will be populated by JavaScript -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- My Prompts Tab -->
+      <div id="tab-content-prompts" class="tab-content hidden">
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Select Prompt</label>
+          <select id="prompt-selector" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <option value="">Choose a prompt...</option>
+          </select>
+        </div>
+        
+        <div id="prompt-analytics" class="hidden">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div class="bg-gray-50 rounded-lg p-4">
+              <h4 class="font-medium text-gray-900 mb-2">Event Counts</h4>
+              <div id="event-counts" class="space-y-2">
+                <!-- Will be populated by JavaScript -->
+              </div>
+            </div>
+            
+            <div class="bg-gray-50 rounded-lg p-4">
+              <h4 class="font-medium text-gray-900 mb-2">Conversion Metrics</h4>
+              <div id="conversion-metrics" class="space-y-2">
+                <!-- Will be populated by JavaScript -->
+              </div>
+            </div>
+            
+            <div class="bg-gray-50 rounded-lg p-4">
+              <h4 class="font-medium text-gray-900 mb-2">Period</h4>
+              <select id="period-selector" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <option value="7">Last 7 days</option>
+                <option value="30" selected>Last 30 days</option>
+                <option value="90">Last 90 days</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="bg-gray-50 rounded-lg p-4">
+            <h4 class="font-medium text-gray-900 mb-4">Daily Views</h4>
+            <div id="daily-views-chart" class="h-64">
+              <!-- Chart will be rendered here -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Marketplace Tab -->
+      <div id="tab-content-marketplace" class="tab-content hidden">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Marketplace Overview</h3>
+            <div id="marketplace-stats" class="space-y-4">
+              <!-- Will be populated by JavaScript -->
+            </div>
+          </div>
+          
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Trending Prompts</h3>
+            <div id="trending-prompts" class="space-y-3">
+              <!-- Will be populated by JavaScript -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentPromptId = null;
+
+// Load analytics on page load
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadUserAnalytics();
+  await loadUserPrompts();
+  await loadMarketplaceAnalytics();
+  setupTabHandlers();
+});
+
+async function loadUserAnalytics() {
+  try {
+    const token = localStorage.getItem("pm_token");
+    if (!token) {
+      window.location.href = "/";
+      return;
+    }
+    
+    const response = await fetch('/api/analytics/dashboard', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    if (!response.ok) throw new Error('Failed to load analytics');
+    
+    const data = await response.json();
+    
+    // Update overview stats
+    document.getElementById('total-prompts').textContent = data.total_prompts;
+    document.getElementById('total-views').textContent = data.total_views.toLocaleString();
+    document.getElementById('total-purchases').textContent = data.total_purchases;
+    document.getElementById('total-revenue').textContent = `$${data.total_revenue}`;
+    
+    // Update top performing prompts
+    const topPromptsContainer = document.getElementById('top-prompts');
+    topPromptsContainer.innerHTML = '';
+    
+    data.top_performing_prompts.forEach(prompt => {
+      const div = document.createElement('div');
+      div.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-lg';
+      div.innerHTML = `
+        <div>
+          <p class="font-medium text-gray-900">${prompt.title}</p>
+          <p class="text-sm text-gray-500">${prompt.views} views, ${prompt.purchases} purchases</p>
+        </div>
+        <div class="text-right">
+          <p class="font-semibold text-green-600">$${prompt.revenue}</p>
+        </div>
+      `;
+      topPromptsContainer.appendChild(div);
+    });
+    
+    // Update recent activity
+    const activityContainer = document.getElementById('recent-activity');
+    activityContainer.innerHTML = '';
+    
+    data.recent_activity.forEach(activity => {
+      const div = document.createElement('div');
+      div.className = 'flex items-center space-x-3 p-3 bg-gray-50 rounded-lg';
+      div.innerHTML = `
+        <div class="flex-shrink-0">
+          <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+          </div>
+        </div>
+        <div class="flex-1">
+          <p class="text-sm font-medium text-gray-900">${activity.prompt_title}</p>
+          <p class="text-xs text-gray-500">${activity.event_type} • ${new Date(activity.created_at).toLocaleDateString()}</p>
+        </div>
+      `;
+      activityContainer.appendChild(div);
+    });
+    
+  } catch (error) {
+    console.error('Error loading analytics:', error);
+  }
+}
+
+async function loadUserPrompts() {
+  try {
+    const token = localStorage.getItem("pm_token");
+    const response = await fetch('/api/dashboard/my-prompts', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    if (!response.ok) throw new Error('Failed to load prompts');
+    
+    const prompts = await response.json();
+    const selector = document.getElementById('prompt-selector');
+    
+    // Clear existing options except the first one
+    selector.innerHTML = '<option value="">Choose a prompt...</option>';
+    
+    prompts.forEach(prompt => {
+      const option = document.createElement('option');
+      option.value = prompt.id;
+      option.textContent = prompt.title;
+      selector.appendChild(option);
+    });
+    
+  } catch (error) {
+    console.error('Error loading prompts:', error);
+  }
+}
+
+async function loadPromptAnalytics(promptId, days = 30) {
+  try {
+    const token = localStorage.getItem("pm_token");
+    const response = await fetch(`/api/analytics/prompt/${promptId}?days=${days}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    if (!response.ok) throw new Error('Failed to load prompt analytics');
+    
+    const data = await response.json();
+    
+    // Update event counts
+    const eventCountsContainer = document.getElementById('event-counts');
+    eventCountsContainer.innerHTML = '';
+    
+    Object.entries(data.event_counts).forEach(([eventType, count]) => {
+      const div = document.createElement('div');
+      div.className = 'flex justify-between';
+      div.innerHTML = `
+        <span class="text-sm text-gray-600 capitalize">${eventType}</span>
+        <span class="text-sm font-medium text-gray-900">${count}</span>
+      `;
+      eventCountsContainer.appendChild(div);
+    });
+    
+    // Update conversion metrics
+    const conversionContainer = document.getElementById('conversion-metrics');
+    conversionContainer.innerHTML = '';
+    
+    const metrics = data.conversion_metrics;
+    const metricsData = [
+      { label: 'View to Purchase', value: `${metrics.view_to_purchase_rate}%` },
+      { label: 'Purchase to Output', value: `${metrics.purchase_to_output_rate}%` },
+      { label: 'Total Views', value: metrics.total_views },
+      { label: 'Total Purchases', value: metrics.total_purchases }
+    ];
+    
+    metricsData.forEach(metric => {
+      const div = document.createElement('div');
+      div.className = 'flex justify-between';
+      div.innerHTML = `
+        <span class="text-sm text-gray-600">${metric.label}</span>
+        <span class="text-sm font-medium text-gray-900">${metric.value}</span>
+      `;
+      conversionContainer.appendChild(div);
+    });
+    
+    // Show the analytics section
+    document.getElementById('prompt-analytics').classList.remove('hidden');
+    
+  } catch (error) {
+    console.error('Error loading prompt analytics:', error);
+  }
+}
+
+async function loadMarketplaceAnalytics() {
+  try {
+    const response = await fetch('/api/analytics/marketplace');
+    if (!response.ok) throw new Error('Failed to load marketplace analytics');
+    
+    const data = await response.json();
+    
+    // Update marketplace stats
+    const statsContainer = document.getElementById('marketplace-stats');
+    statsContainer.innerHTML = '';
+    
+    const stats = [
+      { label: 'Total Prompts', value: data.total_prompts },
+      { label: 'Total Views', value: data.total_views.toLocaleString() },
+      { label: 'Total Purchases', value: data.total_purchases },
+      { label: 'Total Outputs', value: data.total_outputs }
+    ];
+    
+    stats.forEach(stat => {
+      const div = document.createElement('div');
+      div.className = 'flex justify-between p-3 bg-gray-50 rounded-lg';
+      div.innerHTML = `
+        <span class="text-sm font-medium text-gray-900">${stat.label}</span>
+        <span class="text-sm font-semibold text-gray-900">${stat.value}</span>
+      `;
+      statsContainer.appendChild(div);
+    });
+    
+    // Update trending prompts
+    const trendingContainer = document.getElementById('trending-prompts');
+    trendingContainer.innerHTML = '';
+    
+    data.trending_prompts.forEach(prompt => {
+      const div = document.createElement('div');
+      div.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-lg';
+      div.innerHTML = `
+        <div>
+          <p class="font-medium text-gray-900">${prompt.title}</p>
+          <p class="text-sm text-gray-500">${prompt.views} views</p>
+        </div>
+      `;
+      trendingContainer.appendChild(div);
+    });
+    
+  } catch (error) {
+    console.error('Error loading marketplace analytics:', error);
+  }
+}
+
+function setupTabHandlers() {
+  const tabs = ['overview', 'prompts', 'marketplace'];
+  
+  tabs.forEach(tab => {
+    const button = document.getElementById(`tab-${tab}`);
+    const content = document.getElementById(`tab-content-${tab}`);
+    
+    button.addEventListener('click', () => {
+      // Hide all tabs
+      tabs.forEach(t => {
+        document.getElementById(`tab-${t}`).classList.remove('border-blue-500', 'text-blue-600');
+        document.getElementById(`tab-${t}`).classList.add('border-transparent', 'text-gray-500');
+        document.getElementById(`tab-content-${t}`).classList.add('hidden');
+      });
+      
+      // Show selected tab
+      button.classList.remove('border-transparent', 'text-gray-500');
+      button.classList.add('border-blue-500', 'text-blue-600');
+      content.classList.remove('hidden');
+    });
+  });
+  
+  // Setup prompt selector
+  document.getElementById('prompt-selector').addEventListener('change', (e) => {
+    if (e.target.value) {
+      currentPromptId = parseInt(e.target.value);
+      loadPromptAnalytics(currentPromptId);
+    } else {
+      document.getElementById('prompt-analytics').classList.add('hidden');
+    }
+  });
+  
+  // Setup period selector
+  document.getElementById('period-selector').addEventListener('change', (e) => {
+    if (currentPromptId) {
+      loadPromptAnalytics(currentPromptId, parseInt(e.target.value));
+    }
+  });
+}
+</script>
+{% endblock %} 

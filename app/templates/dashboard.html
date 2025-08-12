@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="text-2xl font-semibold mb-4">My Purchases</h1>
+<div id="purchase-list"
+     hx-get="/api/purchase/mine"
+     hx-trigger="load"
+     hx-target="#purchase-list"
+     hx-swap="innerHTML">
+  <div class="text-gray-500">Loading purchases…</div>
+</div>
+
+<template id="purchase-row">
+  <div class="border bg-white rounded p-4 flex items-center justify-between">
+    <div>
+      <div class="font-medium"></div>
+      <div class="text-xs text-gray-500"></div>
+    </div>
+    <a class="text-sm px-3 py-1 rounded bg-indigo-600 text-white" data-href="">Open</a>
+  </div>
+</template>
+
+<script>
+document.addEventListener('htmx:afterOnLoad', (evt) => {
+  if (evt.detail.pathInfo.requestPath === '/api/purchase/mine'){
+    const list = document.getElementById('purchase-list');
+    const token = localStorage.getItem("pm_token");
+    if(!token){
+      list.innerHTML = `<div class="bg-yellow-50 border rounded p-4 text-sm">Login to view your purchases.</div>`;
+      return;
+    }
+    const data = JSON.parse(evt.detail.xhr.responseText);
+    if (data.length === 0){
+      list.innerHTML = `<div class="bg-white border rounded p-4 text-sm">No purchases yet. Go <a class="text-indigo-600 underline" href="/">browse</a>.</div>`;
+      return;
+    }
+    list.innerHTML = '';
+    const t = document.getElementById('purchase-row');
+    data.forEach(row => {
+      const n = t.content.cloneNode(true);
+      n.querySelector('.font-medium').textContent = row.title;
+      n.querySelector('.text-xs').textContent = `Purchased on ${new Date(row.created_at).toLocaleString()}`;
+      n.querySelector('a').href = `/prompts/${row.prompt_id}`;
+      list.appendChild(n);
+    });
+  }
+});
+</script>
+{% endblock %}

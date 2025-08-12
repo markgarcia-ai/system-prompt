@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Seller Dashboard</h1>
+    <p class="text-gray-600 mt-2">Track your prompts, sales, and earnings</p>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="flex items-center">
+        <div class="p-2 bg-blue-100 rounded-lg">
+          <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-gray-600">Total Prompts</p>
+          <p id="total-prompts" class="text-2xl font-semibold text-gray-900">-</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="flex items-center">
+        <div class="p-2 bg-green-100 rounded-lg">
+          <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+          </svg>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-gray-600">Total Sales</p>
+          <p id="total-sales" class="text-2xl font-semibold text-gray-900">-</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="flex items-center">
+        <div class="p-2 bg-yellow-100 rounded-lg">
+          <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+          </svg>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-gray-600">Total Revenue</p>
+          <p id="total-revenue" class="text-2xl font-semibold text-gray-900">-</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="flex items-center">
+        <div class="p-2 bg-purple-100 rounded-lg">
+          <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+          </svg>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-gray-600">Your Earnings</p>
+          <p id="your-earnings" class="text-2xl font-semibold text-gray-900">-</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Revenue Split Info -->
+  <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
+    <div class="flex items-center">
+      <svg class="w-5 h-5 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+      </svg>
+      <p class="text-blue-800">
+        <strong>Revenue Split:</strong> You keep 90% of each sale, we take 10% as platform fee.
+      </p>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="mb-6">
+    <div class="border-b border-gray-200">
+      <nav class="-mb-px flex space-x-8">
+        <button onclick="showTab('sales')" id="tab-sales" class="tab-button border-b-2 border-blue-500 py-2 px-1 text-sm font-medium text-blue-600">
+          Sales History
+        </button>
+        <button onclick="showTab('prompts')" id="tab-prompts" class="tab-button border-b-2 border-transparent py-2 px-1 text-sm font-medium text-gray-500 hover:text-gray-700">
+          My Prompts
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Sales History Tab -->
+  <div id="sales-tab" class="tab-content">
+    <div class="bg-white shadow rounded-lg">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900">Recent Sales</h3>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prompt</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Your Earnings</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+            </tr>
+          </thead>
+          <tbody id="sales-table-body" class="bg-white divide-y divide-gray-200">
+            <!-- Sales data will be loaded here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- My Prompts Tab -->
+  <div id="prompts-tab" class="tab-content hidden">
+    <div class="bg-white shadow rounded-lg">
+      <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+        <h3 class="text-lg font-medium text-gray-900">My Prompts</h3>
+        <a href="/add-prompt" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+          Add New Prompt
+        </a>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+            </tr>
+          </thead>
+          <tbody id="prompts-table-body" class="bg-white divide-y divide-gray-200">
+            <!-- Prompts data will be loaded here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Load dashboard data
+async function loadDashboardData() {
+  try {
+    const token = localStorage.getItem("pm_token");
+    if (!token) {
+      window.location.href = "/";
+      return;
+    }
+
+    // Load stats
+    const statsResponse = await fetch('/api/dashboard/stats', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (statsResponse.ok) {
+      const stats = await statsResponse.json();
+      document.getElementById('total-prompts').textContent = stats.total_prompts;
+      document.getElementById('total-sales').textContent = stats.total_sales;
+      document.getElementById('total-revenue').textContent = stats.revenue_formatted;
+      document.getElementById('your-earnings').textContent = stats.earnings_formatted;
+    }
+
+    // Load sales history
+    const salesResponse = await fetch('/api/dashboard/sales', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (salesResponse.ok) {
+      const sales = await salesResponse.json();
+      const tbody = document.getElementById('sales-table-body');
+      tbody.innerHTML = '';
+      
+      if (sales.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">No sales yet</td></tr>';
+      } else {
+        sales.forEach(sale => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${sale.prompt_title}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${sale.price_formatted}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${sale.earnings_formatted}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date(sale.sold_at).toLocaleDateString()}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      }
+    }
+
+    // Load my prompts
+    const promptsResponse = await fetch('/api/dashboard/my-prompts', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (promptsResponse.ok) {
+      const prompts = await promptsResponse.json();
+      const tbody = document.getElementById('prompts-table-body');
+      tbody.innerHTML = '';
+      
+      if (prompts.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">No prompts created yet</td></tr>';
+      } else {
+        prompts.forEach(prompt => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${prompt.title}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${prompt.price_formatted}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${prompt.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                ${prompt.is_active ? 'Active' : 'Inactive'}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date(prompt.created_at).toLocaleDateString()}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      }
+    }
+  } catch (error) {
+    console.error('Error loading dashboard data:', error);
+  }
+}
+
+// Tab switching
+function showTab(tabName) {
+  // Hide all tab contents
+  document.querySelectorAll('.tab-content').forEach(content => {
+    content.classList.add('hidden');
+  });
+  
+  // Remove active state from all tab buttons
+  document.querySelectorAll('.tab-button').forEach(button => {
+    button.classList.remove('border-blue-500', 'text-blue-600');
+    button.classList.add('border-transparent', 'text-gray-500');
+  });
+  
+  // Show selected tab content
+  document.getElementById(tabName + '-tab').classList.remove('hidden');
+  
+  // Activate selected tab button
+  document.getElementById('tab-' + tabName).classList.remove('border-transparent', 'text-gray-500');
+  document.getElementById('tab-' + tabName).classList.add('border-blue-500', 'text-blue-600');
+}
+
+// Load data when page loads
+document.addEventListener('DOMContentLoaded', loadDashboardData);
+</script>
+{% endblock %} 
