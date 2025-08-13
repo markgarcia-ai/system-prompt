@@ -120,8 +120,9 @@ app/static/uploads/*
 !app/static/uploads/.gitkeep
 
 # Large image files (exclude from git due to size)
-app/templates/resources/*.png
-app/static/resources/*.png
+# Note: Resized images are now allowed
+# app/templates/resources/*.png
+# app/static/resources/*.png
 
 # Stripe
 stripe_webhook_secret.txt 

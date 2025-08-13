@@ -12,6 +12,9 @@ templates = Jinja2Templates(directory="app/templates")
 @app.on_event("startup")
 async def start():
     init_db()
+    # Seed database with mock data if empty
+    from .seed import seed_database
+    seed_database()
 
 app.include_router(auth_routes.router)
 app.include_router(prompt_routes.router)

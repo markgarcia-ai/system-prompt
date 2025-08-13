@@ -1,0 +1,11 @@
+# Git LFS configuration for image files
+*.png filter=lfs diff=lfs merge=lfs -text
+*.jpg filter=lfs diff=lfs merge=lfs -text
+*.jpeg filter=lfs diff=lfs merge=lfs -text
+*.gif filter=lfs diff=lfs merge=lfs -text
+*.webp filter=lfs diff=lfs merge=lfs -text
+*.svg filter=lfs diff=lfs merge=lfs -text
+
+# Keep small images in Git
+app/static/resources/*.png !filter=lfs
+app/templates/resources/*.png !filter=lfs 
