@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from sqlmodel import Session, select
 from typing import Optional, List
 from ..db import get_session
-from ..models import PromptBundle, BundlePrompt, Prompt, User
+from ..models import Bundle, BundlePrompt, Prompt, User
 from ..auth import get_current_user
 from sqlalchemy import func
 
@@ -37,8 +37,8 @@ def create_bundle(data: BundleCreate, user=Depends(get_current_user), session: S
             raise HTTPException(status_code=403, detail=f"Prompt {prompt_id} does not belong to you")
     
     # Create bundle
-    bundle = PromptBundle(
-        title=data.title,
+    bundle = Bundle(
+        name=data.title,
         description=data.description,
         price_cents=data.price_cents,
         owner_id=user.id
@@ -61,7 +61,7 @@ def create_bundle(data: BundleCreate, user=Depends(get_current_user), session: S
 def list_bundles(session: Session = Depends(get_session)):
     """List all active bundles"""
     bundles = session.exec(
-        select(PromptBundle).where(PromptBundle.is_active == True)
+        select(Bundle).where(Bundle.is_active == True)
     ).all()
     
     result = []
@@ -74,7 +74,7 @@ def list_bundles(session: Session = Depends(get_session)):
         
         result.append({
             "id": bundle.id,
-            "title": bundle.title,
+            "title": bundle.name,
             "description": bundle.description,
             "price_cents": bundle.price_cents,
             "price_formatted": f"${bundle.price_cents / 100:.2f}",
@@ -87,7 +87,7 @@ def list_bundles(session: Session = Depends(get_session)):
 @router.get("/{bundle_id}")
 def get_bundle(bundle_id: int, session: Session = Depends(get_session)):
     """Get bundle details with included prompts"""
-    bundle = session.get(PromptBundle, bundle_id)
+    bundle = session.get(Bundle, bundle_id)
     if not bundle or not bundle.is_active:
         raise HTTPException(status_code=404, detail="Bundle not found")
     
@@ -110,7 +110,7 @@ def get_bundle(bundle_id: int, session: Session = Depends(get_session)):
     
     return {
         "id": bundle.id,
-        "title": bundle.title,
+        "title": bundle.name,
         "description": bundle.description,
         "price_cents": bundle.price_cents,
         "price_formatted": f"${bundle.price_cents / 100:.2f}",
@@ -121,7 +121,7 @@ def get_bundle(bundle_id: int, session: Session = Depends(get_session)):
 @router.put("/{bundle_id}")
 def update_bundle(bundle_id: int, data: BundleUpdate, user=Depends(get_current_user), session: Session = Depends(get_session)):
     """Update a bundle (owner only)"""
-    bundle = session.get(PromptBundle, bundle_id)
+    bundle = session.get(Bundle, bundle_id)
     if not bundle:
         raise HTTPException(status_code=404, detail="Bundle not found")
     
@@ -130,7 +130,7 @@ def update_bundle(bundle_id: int, data: BundleUpdate, user=Depends(get_current_u
     
     # Update fields
     if data.title is not None:
-        bundle.title = data.title
+        bundle.name = data.title
     if data.description is not None:
         bundle.description = data.description
     if data.price_cents is not None:
@@ -148,7 +148,7 @@ def update_bundle(bundle_id: int, data: BundleUpdate, user=Depends(get_current_u
 @router.delete("/{bundle_id}")
 def delete_bundle(bundle_id: int, user=Depends(get_current_user), session: Session = Depends(get_session)):
     """Delete a bundle (owner only)"""
-    bundle = session.get(PromptBundle, bundle_id)
+    bundle = session.get(Bundle, bundle_id)
     if not bundle:
         raise HTTPException(status_code=404, detail="Bundle not found")
     
@@ -170,7 +170,7 @@ def delete_bundle(bundle_id: int, user=Depends(get_current_user), session: Sessi
 def get_my_bundles(user=Depends(get_current_user), session: Session = Depends(get_session)):
     """Get bundles created by the current user"""
     bundles = session.exec(
-        select(PromptBundle).where(PromptBundle.owner_id == user.id)
+        select(Bundle).where(Bundle.owner_id == user.id)
     ).all()
     
     result = []
@@ -183,7 +183,7 @@ def get_my_bundles(user=Depends(get_current_user), session: Session = Depends(ge
         
         result.append({
             "id": bundle.id,
-            "title": bundle.title,
+            "title": bundle.name,
             "description": bundle.description,
             "price_cents": bundle.price_cents,
             "price_formatted": f"${bundle.price_cents / 100:.2f}",
