@@ -38,8 +38,11 @@ def market_page(request: Request):
     from sqlmodel import select
     
     # Get all prompts
-    with next(get_session()) as session:
+    session = next(get_session())
+    try:
         prompts = session.exec(select(Prompt)).all()
+    finally:
+        session.close()
     
     return templates.TemplateResponse("market.html", {"request": request, "prompts": prompts})
 
