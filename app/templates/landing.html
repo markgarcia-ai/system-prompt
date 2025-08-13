@@ -127,8 +127,8 @@
       <!-- Feature Card 4 -->
       <div class="group bg-white p-8 rounded-2xl border border-gray-200 hover:border-gray-300 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
         <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-          <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+          <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.5 1.5 0 0 0 18.54 8H17c-.8 0-1.54.37-2.01 1l-1.7 2.26V9H12v11h6zm-7.5-1.5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5.67-1.5 1.5-1.5 1.5.67 1.5 1.5zM5.5 6c1.11 0 2-.89 2-2s-.89-2-2-2-2 .89-2 2 .89 2 2 2zm2 16v-7H9V9c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v6h1.5v7h4z"/>
           </svg>
         </div>
         <h3 class="text-xl font-semibold text-gray-900 mb-3">Community Driven</h3>
@@ -141,8 +141,8 @@
       <!-- Feature Card 5 -->
       <div class="group bg-white p-8 rounded-2xl border border-gray-200 hover:border-gray-300 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
         <div class="w-16 h-16 bg-gradient-to-r from-emerald-500 to-green-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-          <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+          <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
           </svg>
         </div>
         <h3 class="text-xl font-semibold text-gray-900 mb-3">Secure Transactions</h3>
@@ -179,7 +179,7 @@
         Discover Amazing Prompts
       </h2>
       <p class="text-xl text-gray-300 max-w-3xl mx-auto">
-        See what our community has created. Each prompt comes with real examples, ratings, and AI model insights.
+        Discover prompts tailored to your interests. See what our community has created with real examples, ratings, and AI model insights.
       </p>
     </div>
     
@@ -427,89 +427,7 @@
 </div>
 
 <script>
-// Check authentication and load recommendations when page loads
-document.addEventListener('DOMContentLoaded', async () => {
-  await checkAuthAndLoadRecommendations();
-});
 
-async function checkAuthAndLoadRecommendations() {
-  const token = localStorage.getItem("pm_token");
-  const recommendationsSection = document.getElementById('recommendations-section');
-  
-  if (!token) {
-    // Hide recommendations section if user is not logged in
-    recommendationsSection.style.display = 'none';
-    return;
-  }
-  
-  // Show recommendations section and load recommendations
-  recommendationsSection.style.display = 'block';
-  await loadRecommendations();
-}
-
-async function loadRecommendations() {
-  try {
-    const token = localStorage.getItem("pm_token");
-    const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
-    
-    const response = await fetch('/api/search/recommendations', { headers });
-    if (!response.ok) throw new Error('Failed to load recommendations');
-    
-    const recommendations = await response.json();
-    const grid = document.getElementById('recommendations-grid');
-    
-    if (recommendations.length === 0) {
-      grid.innerHTML = `
-        <div class="col-span-full text-center py-8 text-gray-500">
-          <p>No recommendations available yet. Browse our marketplace to discover great prompts!</p>
-        </div>
-      `;
-      return;
-    }
-    
-    grid.innerHTML = '';
-    recommendations.forEach(prompt => {
-      const card = createRecommendationCard(prompt);
-      grid.appendChild(card);
-    });
-    
-  } catch (error) {
-    console.error('Error loading recommendations:', error);
-    const grid = document.getElementById('recommendations-grid');
-    grid.innerHTML = `
-      <div class="col-span-full text-center py-8 text-gray-500">
-        <p>Unable to load recommendations. Please try again later.</p>
-      </div>
-    `;
-  }
-}
-
-function createRecommendationCard(prompt) {
-  const div = document.createElement('div');
-  div.className = 'bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200';
-  div.innerHTML = `
-    <div class="p-6">
-      <div class="flex items-start justify-between mb-4">
-        <h3 class="text-lg font-semibold text-gray-900 line-clamp-2">${prompt.title}</h3>
-        <span class="text-lg font-bold text-blue-600">${prompt.price_formatted}</span>
-      </div>
-      <p class="text-gray-600 text-sm mb-4 line-clamp-3">${prompt.description}</p>
-      <div class="flex items-center justify-between text-xs text-gray-500 mb-4">
-        <span>${prompt.views} views</span>
-        <span class="inline-flex items-center px-2 py-1 rounded text-xs bg-gray-100 text-gray-700">
-          ${prompt.license_type}
-        </span>
-      </div>
-      <div class="flex items-center justify-between">
-        <span class="text-xs text-blue-600 font-medium">${prompt.reason}</span>
-        <a href="/prompts/${prompt.id}" class="text-sm font-medium text-blue-600 hover:text-blue-700">
-          View Details →
-        </a>
-      </div>
-    </div>
-  `;
-  return div;
-}
 
 // Carousel functionality
 document.addEventListener('DOMContentLoaded', () => {
@@ -563,32 +481,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-<!-- Recommendations Section -->
-<div id="recommendations-section" class="py-20 bg-gray-800" style="display: none;">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-12">
-      <h2 class="text-3xl font-bold text-white mb-4">
-        Recommended for You
-      </h2>
-      <p class="text-xl text-gray-300">
-        Discover prompts tailored to your interests
-      </p>
-    </div>
-    
-    <div id="recommendations-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <!-- Recommendations will be loaded here -->
-    </div>
-    
-    <div class="text-center mt-8">
-      <a href="/market" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200">
-        Browse All Prompts
-        <svg class="ml-2 -mr-1 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
-        </svg>
-      </a>
-    </div>
-  </div>
-</div>
+
 
 <!-- CTA Section -->
 <div class="py-20 bg-white">

@@ -11,7 +11,54 @@
   <div id="prompt-detail" class="hidden">
     <!-- Header Section -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-      <div class="flex items-start justify-between mb-4">
+      <!-- Mobile: Stacked layout -->
+      <div class="lg:hidden">
+        <h1 id="prompt-title" class="text-2xl font-bold text-gray-900 mb-2"></h1>
+        <p id="prompt-description" class="text-base text-gray-600 mb-4"></p>
+        
+        <!-- Tags -->
+        <div id="prompt-tags" class="flex flex-wrap gap-2 mb-4"></div>
+        
+        <!-- Stats Row - Mobile optimized -->
+        <div class="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-4">
+          <div class="flex items-center">
+            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
+              <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span id="prompt-views-mobile">0 views</span>
+          </div>
+          <div class="flex items-center">
+            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+            </svg>
+            <span id="prompt-rating-mobile">No ratings yet</span>
+          </div>
+          <div class="flex items-center">
+            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+            </svg>
+            <span id="prompt-outputs-mobile">0 outputs</span>
+          </div>
+          <span id="prompt-license-mobile" class="inline-flex items-center px-2 py-1 rounded text-xs bg-gray-100 text-gray-700"></span>
+        </div>
+
+        <!-- Price and Actions - Mobile -->
+        <div class="text-center mb-4">
+          <div class="text-3xl font-bold text-blue-600 mb-4" id="prompt-price-mobile"></div>
+          <div class="space-y-3">
+            <button id="buy-button-mobile" onclick="buyPrompt({{pid}})" class="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium">
+              Buy & Unlock
+            </button>
+            <button id="view-full-button-mobile" onclick="viewFull({{pid}})" class="w-full px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 font-medium">
+              I already own it
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Desktop: Side-by-side layout -->
+      <div class="hidden lg:flex items-start justify-between mb-4">
         <div class="flex-1">
           <h1 id="prompt-title" class="text-3xl font-bold text-gray-900 mb-2"></h1>
           <p id="prompt-description" class="text-lg text-gray-600 mb-4"></p>
@@ -42,7 +89,7 @@
             </div>
             <span id="prompt-license" class="inline-flex items-center px-2 py-1 rounded text-xs bg-gray-100 text-gray-700"></span>
           </div>
-</div>
+        </div>
 
         <!-- Price and Actions -->
         <div class="text-right ml-6">
@@ -60,7 +107,7 @@
     </div>
 
     <!-- Content Section -->
-    <div class="grid lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <!-- Main Content -->
       <div class="lg:col-span-2 space-y-6">
         <!-- Preview/Full Content -->
@@ -144,7 +191,7 @@
                 <textarea id="output-feedback" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="How was this prompt? Any suggestions?"></textarea>
               </div>
               
-              <div class="flex space-x-3">
+              <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
                 <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
                   Submit Output
                 </button>
@@ -214,8 +261,11 @@ async function loadPromptDetails() {
     document.getElementById('prompt-title').textContent = promptData.title;
     document.getElementById('prompt-description').textContent = promptData.description;
     document.getElementById('prompt-views').textContent = `${promptData.views} views`;
+    document.getElementById('prompt-views-mobile').textContent = `${promptData.views} views`;
     document.getElementById('prompt-price').textContent = promptData.price_formatted;
+    document.getElementById('prompt-price-mobile').textContent = promptData.price_formatted;
     document.getElementById('prompt-license').textContent = promptData.license_type;
+    document.getElementById('prompt-license-mobile').textContent = promptData.license_type;
     document.getElementById('preview-text').textContent = promptData.preview;
     
     // Show tags
@@ -297,10 +347,12 @@ async function loadPromptStats() {
     // Update rating display
     if (stats.average_rating) {
       document.getElementById('prompt-rating').textContent = `${stats.average_rating} ★ (${stats.total_outputs} outputs)`;
+      document.getElementById('prompt-rating-mobile').textContent = `${stats.average_rating} ★ (${stats.total_outputs} outputs)`;
     }
     
     // Update outputs count
     document.getElementById('prompt-outputs').textContent = `${stats.total_outputs} outputs`;
+    document.getElementById('prompt-outputs-mobile').textContent = `${stats.total_outputs} outputs`;
     
     // Show rating distribution
     const ratingStats = document.getElementById('rating-stats');

@@ -10,17 +10,16 @@ router = APIRouter(prefix="/api/outputs", tags=["outputs"])
 
 class OutputCreate(BaseModel):
     prompt_id: int
-    output_text: str
+    content: str
+    output_type: str = "text"  # 'text' or 'image'
     rating: Optional[int] = None
     feedback: Optional[str] = None
-    image_url: Optional[str] = None
-    ai_model: Optional[str] = None
 
 class OutputUpdate(BaseModel):
+    content: Optional[str] = None
+    output_type: Optional[str] = None
     rating: Optional[int] = None
     feedback: Optional[str] = None
-    image_url: Optional[str] = None
-    ai_model: Optional[str] = None
 
 @router.post("")
 def create_output(data: OutputCreate, user=Depends(get_current_user), session: Session = Depends(get_session)):
@@ -45,11 +44,10 @@ def create_output(data: OutputCreate, user=Depends(get_current_user), session: S
     output = PromptOutput(
         prompt_id=data.prompt_id,
         user_id=user.id,
-        output_text=data.output_text,
+        content=data.content,
+        output_type=data.output_type,
         rating=data.rating,
-        feedback=data.feedback,
-        image_url=data.image_url,
-        ai_model=data.ai_model
+        feedback=data.feedback
     )
     
     session.add(output)
@@ -79,11 +77,10 @@ def get_prompt_outputs(prompt_id: int, session: Session = Depends(get_session)):
     
     return [{
         "id": output.id,
-        "output_text": output.output_text,
+        "content": output.content,
+        "output_type": output.output_type,
         "rating": output.rating,
         "feedback": output.feedback,
-        "image_url": output.image_url,
-        "ai_model": output.ai_model,
         "user_email": email,
         "created_at": output.created_at
     } for (output, email) in outputs]
@@ -137,10 +134,10 @@ def update_output(output_id: int, data: OutputUpdate, user=Depends(get_current_u
         output.rating = data.rating
     if data.feedback is not None:
         output.feedback = data.feedback
-    if data.image_url is not None:
-        output.image_url = data.image_url
-    if data.ai_model is not None:
-        output.ai_model = data.ai_model
+    if data.content is not None:
+        output.content = data.content
+    if data.output_type is not None:
+        output.output_type = data.output_type
     
     session.commit()
     session.refresh(output)

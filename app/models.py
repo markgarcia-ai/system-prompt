@@ -68,6 +68,9 @@ class BundlePrompt(SQLModel, table=True):
 class PromptOutput(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     prompt_id: int = Field(foreign_key="prompt.id")
+    user_id: int = Field(foreign_key="user.id")
     output_type: str  # 'text' or 'image'
     content: str
+    rating: Optional[int] = None  # 1-5 rating
+    feedback: Optional[str] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)

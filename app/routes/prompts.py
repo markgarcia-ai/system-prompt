@@ -69,13 +69,8 @@ def get_prompt(prompt_id: int, session: Session = Depends(get_session)):
     # Increment view count
     p.views += 1
     
-    # Track analytics event
-    analytics = Analytics(
-        prompt_id=prompt_id,
-        event_type="view",
-        user_id=None  # Anonymous view
-    )
-    session.add(analytics)
+    # Track analytics event (only for logged-in users)
+    # For anonymous views, we just increment the view count above
     session.commit()
     
     # Get tags for this prompt

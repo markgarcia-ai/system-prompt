@@ -202,25 +202,16 @@ def seed_database():
             session.add(purchase)
         session.commit()
         
-        # Create analytics events
+        # Create analytics events (only for logged-in users)
         analytics_events = []
-        for prompt in prompts:
-            # Add view events
-            for _ in range(prompt.views):
-                analytics_events.append(Analytics(
-                    prompt_id=prompt.id,
-                    user_id=None,  # Anonymous views
-                    event_type="view"
-                ))
-            
-            # Add purchase events for purchased prompts
-            for purchase in purchases:
-                if purchase.prompt_id == prompt.id:
-                    analytics_events.append(Analytics(
-                        prompt_id=prompt.id,
-                        user_id=purchase.user_id,
-                        event_type="purchase"
-                    ))
+        
+        # Add purchase events for purchased prompts
+        for purchase in purchases:
+            analytics_events.append(Analytics(
+                prompt_id=purchase.prompt_id,
+                user_id=purchase.user_id,
+                event_type="purchase"
+            ))
         
         for event in analytics_events:
             session.add(event)
