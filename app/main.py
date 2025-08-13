@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from .db import init_db
-from .routes import auth as auth_routes, prompts as prompt_routes, purchases as purchase_routes, dashboard as dashboard_routes, tags as tags_routes, outputs as outputs_routes, search as search_routes, analytics as analytics_routes, bundles as bundles_routes, uploads as uploads_routes
+from .routes import auth as auth_routes, prompts as prompt_routes, purchases as purchase_routes, dashboard as dashboard_routes, tags as tags_routes, outputs as outputs_routes, search as search_routes, analytics as analytics_routes, bundles as bundles_routes, uploads as uploads_routes, webhooks as webhooks_routes
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
@@ -23,6 +23,7 @@ app.include_router(search_routes.router)
 app.include_router(analytics_routes.router)
 app.include_router(bundles_routes.router)
 app.include_router(uploads_routes.router)
+app.include_router(webhooks_routes.router)
 
 @app.get("/", response_class=HTMLResponse)
 def landing_page(request: Request):
