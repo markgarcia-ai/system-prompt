@@ -45,7 +45,7 @@ def login(data: LoginIn, session: Session = Depends(get_session)):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     return {"token": create_token(u.id), "email": u.email}
 
-@router.get("/profile")
+@router.get("/me")
 def get_profile(user=Depends(get_current_user), session: Session = Depends(get_session)):
     """Get current user's profile"""
     return {

@@ -104,14 +104,14 @@
 <script>
   // Load profile data
   async function loadProfile() {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('pm_token');
     if (!token) {
-      window.location.href = '/login';
+      window.location.href = '/';
       return;
     }
 
     try {
-      const response = await fetch('/api/auth/profile', {
+      const response = await fetch('/api/auth/me', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
@@ -153,7 +153,7 @@
       paypal_email: document.getElementById('paypal_email').value
     };
 
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('pm_token');
     
     try {
       const response = await fetch('/api/auth/profile', {
@@ -186,7 +186,7 @@
       new_password: document.getElementById('new_password').value
     };
 
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('pm_token');
     
     try {
       const response = await fetch('/api/auth/password', {
@@ -219,7 +219,7 @@
     const formData = new FormData();
     formData.append('file', file);
 
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('pm_token');
     
     try {
       const response = await fetch('/api/auth/avatar', {
