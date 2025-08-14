@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from .db import init_db
 from .routes import auth as auth_routes, prompts as prompt_routes, purchases as purchase_routes, dashboard as dashboard_routes, tags as tags_routes, outputs as outputs_routes, search as search_routes, analytics as analytics_routes, bundles as bundles_routes, uploads as uploads_routes, webhooks as webhooks_routes, payments as payments_routes
-import jwt
+from jose import jwt
 from .auth import SECRET_KEY, ALGORITHM
 
 app = FastAPI()
