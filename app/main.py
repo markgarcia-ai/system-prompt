@@ -33,19 +33,7 @@ app.include_router(payments_routes.router)
 
 @app.get("/")
 def landing_page(request: Request):
-    """Landing page - redirect logged-in users to dashboard"""
-    # Check if user is logged in
-    token = request.cookies.get("token")
-    if token:
-        try:
-            # Verify token and redirect to dashboard if valid
-            payload = jwt.decode(token, SECRET, algorithms=[ALGO])
-            user_id = payload.get("sub")
-            if user_id:
-                return RedirectResponse(url="/dashboard")
-        except:
-            pass  # Invalid token, continue to landing page
-    
+    """Landing page - frontend will handle auth redirect"""
     return templates.TemplateResponse("landing.html", {"request": request})
 
 @app.get("/market", response_class=HTMLResponse)

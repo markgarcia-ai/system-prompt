@@ -46,6 +46,18 @@
           <a href="/dashboard" class="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">Dashboard</a>
           <a href="/analytics" class="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">Analytics</a>
           <a href="/add-prompt" class="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">Add Prompt</a>`;
+        
+        // Change Home link to Profile for logged-in users
+        const homeLink = document.getElementById('home-link');
+        const mobileHomeLink = document.getElementById('mobile-home-link');
+        if (homeLink) {
+          homeLink.textContent = 'Profile';
+          homeLink.href = '/profile';
+        }
+        if (mobileHomeLink) {
+          mobileHomeLink.textContent = 'Profile';
+          mobileHomeLink.href = '/profile';
+        }
       } else {
         // User is not logged in - show only login/register
         authEl.innerHTML = `
@@ -60,6 +72,18 @@
           <a href="#" onclick="openAuth('register')" class="block px-3 py-2 text-base font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 mt-2">Get Started</a>`;
         
         mobileMenuEl.innerHTML = ''; // No menu items for non-logged in users
+        
+        // Reset Home link for non-logged in users
+        const homeLink = document.getElementById('home-link');
+        const mobileHomeLink = document.getElementById('mobile-home-link');
+        if (homeLink) {
+          homeLink.textContent = 'Home';
+          homeLink.href = '/';
+        }
+        if (mobileHomeLink) {
+          mobileHomeLink.textContent = 'Home';
+          mobileHomeLink.href = '/';
+        }
       }
       
       // Update recommendations section if on landing page
@@ -121,7 +145,7 @@
         
         <!-- Desktop Navigation Links -->
         <nav class="hidden md:flex items-center space-x-8">
-          <a href="/" class="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">Home</a>
+          <a href="/" id="home-link" class="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">Home</a>
           <a href="/market" class="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">Browse Prompts</a>
           <div id="nav-menu" class="flex items-center space-x-8">
             <!-- These will be populated by JavaScript based on auth state -->
@@ -135,7 +159,7 @@
       <!-- Mobile Navigation Menu -->
       <div id="mobile-menu" class="hidden md:hidden">
         <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-gray-200">
-          <a href="/" class="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">Home</a>
+          <a href="/" id="mobile-home-link" class="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">Home</a>
           <a href="/market" class="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium">Browse Prompts</a>
           <div id="mobile-nav-menu" class="space-y-1">
             <!-- Mobile menu items will be populated by JavaScript -->

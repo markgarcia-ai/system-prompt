@@ -566,4 +566,16 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
   </div>
 </footer>
+<script>
+// Check if user is logged in and redirect to dashboard
+document.addEventListener('DOMContentLoaded', function() {
+  const token = localStorage.getItem('pm_token');
+  const email = localStorage.getItem('pm_email');
+  
+  if (token && email) {
+    // User is logged in, redirect to dashboard
+    window.location.href = '/dashboard';
+  }
+});
+</script>
 {% endblock %} 
