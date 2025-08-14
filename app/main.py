@@ -5,7 +5,7 @@ from fastapi.templating import Jinja2Templates
 from .db import init_db
 from .routes import auth as auth_routes, prompts as prompt_routes, purchases as purchase_routes, dashboard as dashboard_routes, tags as tags_routes, outputs as outputs_routes, search as search_routes, analytics as analytics_routes, bundles as bundles_routes, uploads as uploads_routes, webhooks as webhooks_routes, payments as payments_routes
 from jose import jwt
-from .auth import SECRET_KEY, ALGORITHM
+from .auth import SECRET, ALGO
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
@@ -39,7 +39,7 @@ def landing_page(request: Request):
     if token:
         try:
             # Verify token and redirect to dashboard if valid
-            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            payload = jwt.decode(token, SECRET, algorithms=[ALGO])
             user_id = payload.get("sub")
             if user_id:
                 return RedirectResponse(url="/dashboard")
