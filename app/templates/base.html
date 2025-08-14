@@ -205,7 +205,8 @@
       const data = await res.json();
       setAuthState(data.email, data.token);
       document.getElementById('auth-dialog').close();
-      location.reload();
+      // Redirect to dashboard after login instead of reloading
+      window.location.href = "/dashboard";
     }
   </script>
 </body>

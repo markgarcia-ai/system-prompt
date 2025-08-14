@@ -4,10 +4,27 @@ from sqlmodel import SQLModel, Field
 
 class User(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    email: str = Field(index=True, unique=True)
+    email: str = Field(unique=True, index=True)
     password_hash: str
-    is_seller: bool = False
-    stripe_account_id: Optional[str] = None
+    is_active: bool = Field(default=True)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    
+    # Profile fields
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    bio: Optional[str] = None
+    avatar_url: Optional[str] = None
+    website: Optional[str] = None
+    location: Optional[str] = None
+    
+    # Payment/withdrawal fields
+    stripe_customer_id: Optional[str] = None
+    stripe_account_id: Optional[str] = None  # For payouts
+    paypal_email: Optional[str] = None
+    bank_account_info: Optional[str] = None  # Encrypted bank details
+    
+    # Account balance
+    balance_cents: int = Field(default=0)  # Balance in cents
 
 class Prompt(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)

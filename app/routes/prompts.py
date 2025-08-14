@@ -61,40 +61,44 @@ def list_prompts(
 
 @router.get("/{prompt_id}")
 def get_prompt(prompt_id: int, session: Session = Depends(get_session)):
-    """Get prompt details with view tracking"""
+    """Get prompt details by ID (public)"""
     p = session.get(Prompt, prompt_id)
-    if not p or not p.is_active: 
+    if not p:
         raise HTTPException(status_code=404)
-    
-    # Increment view count
+
     p.views += 1
-    
+
     # Track analytics event (only for logged-in users)
     # For anonymous views, we just increment the view count above
     session.commit()
-    
+
     # Get tags for this prompt
-    prompt_tags = session.exec(
-        select(Tag.name)
-        .join(PromptTag, Tag.id == PromptTag.tag_id)
-        .where(PromptTag.prompt_id == prompt_id)
-    ).all()
-    
-    # Show only first 300 characters for non-purchasers
-    excerpt = p.content[:300] + ("…" if len(p.content) > 300 else "")
+    tags = session.exec(select(Tag).join(PromptTag).where(PromptTag.prompt_id == prompt_id)).all()
     
     return {
         "id": p.id,
         "title": p.title,
         "description": p.description,
-        "price_cents": p.price_cents,
+        "content": p.content,
+        "preview": p.preview,
+        "price": p.price,
+        "price_formatted": f"${p.price:.2f}",
         "views": p.views,
+        "downloads": p.downloads,
         "license_type": p.license_type,
         "is_featured": p.is_featured,
-        "tags": prompt_tags,
-        "preview": excerpt,
-        "price_formatted": f"${p.price_cents / 100:.2f}"
+        "created_at": p.created_at,
+        "tags": [{"id": tag.id, "name": tag.name} for tag in tags]
     }
+
+@router.get("/{prompt_id}/ownership")
+def check_prompt_ownership(prompt_id: int, user=Depends(get_current_user), session: Session = Depends(get_session)):
+    """Check if current user owns this prompt"""
+    p = session.get(Prompt, prompt_id)
+    if not p:
+        raise HTTPException(status_code=404)
+    
+    return {"owns_prompt": p.user_id == user.id}
 
 @router.post("")
 def create_prompt(data: PromptIn, user=Depends(get_current_user), session: Session = Depends(get_session)):

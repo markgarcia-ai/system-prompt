@@ -53,6 +53,15 @@
             <button id="view-full-button-mobile" onclick="viewFull({{pid}})" class="w-full px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 font-medium">
               I already own it
             </button>
+            <!-- Owner Actions - Mobile -->
+            <div id="owner-actions-mobile" class="hidden space-y-3">
+              <button onclick="editPrompt({{pid}})" class="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 font-medium">
+                Edit Prompt
+              </button>
+              <button onclick="deletePrompt({{pid}})" class="w-full px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 font-medium">
+                Delete Prompt
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -95,12 +104,23 @@
         <div class="text-right ml-6">
           <div class="text-3xl font-bold text-blue-600 mb-4" id="prompt-price"></div>
           <div class="space-y-2">
-            <button id="buy-button" onclick="buyPrompt({{pid}})" class="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium">
-              Buy & Unlock
-            </button>
-            <button id="view-full-button" onclick="viewFull({{pid}})" class="w-full px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 font-medium">
-              I already own it
-            </button>
+            <div class="flex space-x-3">
+              <button id="buy-button" onclick="buyPrompt({{pid}})" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium">
+                Buy & Unlock
+              </button>
+              <button id="view-full-button" onclick="viewFull({{pid}})" class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 font-medium">
+                I already own it
+              </button>
+              <!-- Owner Actions - Desktop -->
+              <div id="owner-actions" class="hidden flex space-x-3">
+                <button onclick="editPrompt({{pid}})" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 font-medium">
+                  Edit Prompt
+                </button>
+                <button onclick="deletePrompt({{pid}})" class="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 font-medium">
+                  Delete Prompt
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -356,31 +376,84 @@ async function loadPromptStats() {
     
     // Show rating distribution
     const ratingStats = document.getElementById('rating-stats');
-    if (stats.rating_distribution && Object.keys(stats.rating_distribution).length > 0) {
+    if (ratingStats && stats.rating_distribution) {
       ratingStats.innerHTML = '';
       for (let i = 5; i >= 1; i--) {
         const count = stats.rating_distribution[i] || 0;
-        const percentage = stats.total_outputs > 0 ? Math.round((count / stats.total_outputs) * 100) : 0;
-        
-        const ratingRow = document.createElement('div');
-        ratingRow.className = 'flex items-center space-x-2';
-        ratingRow.innerHTML = `
-          <span class="text-sm text-gray-600 w-4">${i}★</span>
-          <div class="flex-1 bg-gray-200 rounded-full h-2">
-            <div class="bg-yellow-400 h-2 rounded-full" style="width: ${percentage}%"></div>
+        const percentage = stats.total_outputs > 0 ? (count / stats.total_outputs * 100) : 0;
+        ratingStats.innerHTML += `
+          <div class="flex items-center space-x-2">
+            <span class="text-sm text-gray-600">${i}★</span>
+            <div class="flex-1 bg-gray-200 rounded-full h-2">
+              <div class="bg-yellow-400 h-2 rounded-full" style="width: ${percentage}%"></div>
+            </div>
+            <span class="text-sm text-gray-600">${count}</span>
           </div>
-          <span class="text-sm text-gray-600 w-8">${count}</span>
         `;
-        ratingStats.appendChild(ratingRow);
       }
-    } else {
-      ratingStats.innerHTML = '<p class="text-gray-500 text-sm">No ratings yet</p>';
     }
     
-  } catch (error) {
-    console.error('Error loading stats:', error);
+    // Check if user owns this prompt and show owner actions
+    checkPromptOwnership();
   }
-}
+  
+  async function checkPromptOwnership() {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    
+    try {
+      const response = await fetch(`/api/prompts/{{pid}}/ownership`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (data.owns_prompt) {
+          document.getElementById('owner-actions').classList.remove('hidden');
+          document.getElementById('owner-actions-mobile').classList.remove('hidden');
+          document.getElementById('buy-button').classList.add('hidden');
+          document.getElementById('buy-button-mobile').classList.add('hidden');
+          document.getElementById('view-full-button').classList.add('hidden');
+          document.getElementById('view-full-button-mobile').classList.add('hidden');
+        }
+      }
+    } catch (error) {
+      console.error('Error checking ownership:', error);
+    }
+  }
+  
+  function editPrompt(promptId) {
+    window.location.href = `/edit-prompt/${promptId}`;
+  }
+  
+  async function deletePrompt(promptId) {
+    if (!confirm('Are you sure you want to delete this prompt? This action cannot be undone.')) {
+      return;
+    }
+    
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('Please log in to delete prompts');
+      return;
+    }
+    
+    try {
+      const response = await fetch(`/api/prompts/${promptId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        alert('Prompt deleted successfully');
+        window.location.href = '/dashboard';
+      } else {
+        const error = await response.json();
+        alert(`Error: ${error.detail}`);
+      }
+    } catch (error) {
+      console.error('Error deleting prompt:', error);
+      alert('Error deleting prompt');
+    }
+  }
 
 function createOutputElement(output) {
   const div = document.createElement('div');

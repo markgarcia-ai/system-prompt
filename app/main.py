@@ -3,7 +3,9 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from .db import init_db
-from .routes import auth as auth_routes, prompts as prompt_routes, purchases as purchase_routes, dashboard as dashboard_routes, tags as tags_routes, outputs as outputs_routes, search as search_routes, analytics as analytics_routes, bundles as bundles_routes, uploads as uploads_routes, webhooks as webhooks_routes
+from .routes import auth as auth_routes, prompts as prompt_routes, purchases as purchase_routes, dashboard as dashboard_routes, tags as tags_routes, outputs as outputs_routes, search as search_routes, analytics as analytics_routes, bundles as bundles_routes, uploads as uploads_routes, webhooks as webhooks_routes, payments as payments_routes
+import jwt
+from .auth import SECRET_KEY, ALGORITHM
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
@@ -27,10 +29,23 @@ app.include_router(analytics_routes.router)
 app.include_router(bundles_routes.router)
 app.include_router(uploads_routes.router)
 app.include_router(webhooks_routes.router)
+app.include_router(payments_routes.router)
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/")
 def landing_page(request: Request):
-    """Landing page with hero section and features"""
+    """Landing page - redirect logged-in users to dashboard"""
+    # Check if user is logged in
+    token = request.cookies.get("token")
+    if token:
+        try:
+            # Verify token and redirect to dashboard if valid
+            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            user_id = payload.get("sub")
+            if user_id:
+                return RedirectResponse(url="/dashboard")
+        except:
+            pass  # Invalid token, continue to landing page
+    
     return templates.TemplateResponse("landing.html", {"request": request})
 
 @app.get("/market", response_class=HTMLResponse)
@@ -57,10 +72,15 @@ def prompt_detail(pid: int, request: Request):
 def success(request: Request):
     return templates.TemplateResponse("dashboard.html", {"request": request})
 
-@app.get("/dashboard", response_class=HTMLResponse)
-def dashboard(request: Request):
-    """Dashboard for sellers to view their sales and earnings"""
-    return templates.TemplateResponse("seller_dashboard.html", {"request": request})
+@app.get("/dashboard")
+def dashboard_page(request: Request):
+    """Dashboard page for logged-in users"""
+    return templates.TemplateResponse("dashboard.html", {"request": request})
+
+@app.get("/profile")
+def profile_page(request: Request):
+    """Profile management page"""
+    return templates.TemplateResponse("profile.html", {"request": request})
 
 @app.get("/add-prompt", response_class=HTMLResponse)
 def add_prompt_page(request: Request):
